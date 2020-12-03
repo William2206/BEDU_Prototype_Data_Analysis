@@ -10,18 +10,20 @@ library(sentiment)
 library(twitteR)
 
 
-api_key <- "fLhZ1l48o1vAMXXUQzob8o6g0"
-api_secret <- "tXYLvXyAQ0vnJs5pBqO1Jivv5bGjnJFrDqXesirmGxsqDBsNWF"
-access_token <- "2705517390-731ZwVNQ512okLjdaJKBKlQ9fc8UfVDvEIaNEJR"
-access_token_secret <- "KPDyffRYWMiE33oLFugrdINKQoTFj4X8mXptmV1NlxfSs"
+api_key <- "QKjDC3rPXjGifSNnE5WFvNi8j"
+api_secret <- "UHp3UfOdFdKRRdEbhtRxhuHG6g9NQ8NvhublfD5bQLTuP2lPUj"
+access_token <- "2705517390-5hUOgMLry1aMl76cAUfnpwBCP1TbZhfqkaZXCdH"
+access_token_secret <- "LH6RutQkH5dYR734y366gNjGkZTXsJOTYWlQOGMAwvU2w"
 
 setup_twitter_oauth(api_key, api_secret,
                     access_token, access_token_secret)
 
-tweets <- searchTwitter("@Infonavit", n = 10000)
-df_tweets <- do.call("rbind", lapply(tweets, as.data.frame))
+tweets_Infonavit <- searchTwitter("@Infonavit", n = 10000)
+tweets_Fovissste <- searchTwitter("@FOVISSSTEmx", n = 10000)
+#df_tweets <- do.call("rbind", lapply(tweets, as.data.frame))
 
-texts <- sapply(tweets, function(x) x$getText())
+texts_Infonavit <- sapply(tweets_Infonavit, function(x) x$getText())
+texts_Fovissste <- sapply(tweets_Fovissste, function(x) x$getText())
 
 clean.data <- function(text){
   #eliminar re-tweets y @ del texto original
@@ -37,12 +39,16 @@ clean.data <- function(text){
   text = gsub("[ \t]{2,}", "", text)
   text = gsub("^\\s+|\\s+$", "", text)
 }
-texts <- clean.data(texts)
+
+texts_Infonavit <- clean.data(texts_Infonavit)
+texts_Fovissste <- clean.data(texts_Fovissste)
 
 library(stringi)
-texts <- stri_trans_general(texts, "Latin-ASCII")
+texts_Infonavit <- stri_trans_general(texts_Infonavit, "Latin-ASCII")
+texts_Fovissste <- stri_trans_general(texts_Fovissste, "Latin-ASCII")
 
-head(texts)
+head(texts_Infonavit)
+head(texts_Fovissste)
 
 handle.error <- function(x){
   #crear el valor omitido
@@ -56,22 +62,23 @@ handle.error <- function(x){
   return(y)
 }
 
-texts = sapply(texts, handle.error)
+texts_Infonavit = sapply(texts_Infonavit, handle.error)
+texts_Fovissste = sapply(texts_Fovissste, handle.error)
 
-head(texts)
+head(texts_Infonavit)
+head(texts_Fovissste)
 
-texts <- texts[!is.na(texts)]
+texts_Infonavit <- texts_Infonavit[!is.na(texts_Infonavit)]
+texts_Fovissste <- texts_Fovissste[!is.na(texts_Fovissste)]
 
-names(texts) <- NULL
+names(texts_Infonavit) <- NULL
+names(texts_Fovissste) <- NULL
+
 library(data.table)
-texts <- as.data.frame(texts)
-texts <- tm_map(texts,
-                content_transformer(function(x) iconv(x, to='ASCII', sub='byte'))
-)
+texts_Infonavit <- as.data.frame(texts_Infonavit)
+fwrite(texts_Infonavit, 'C:/Users/IN334839/Desktop/Cursos/Data Analysis/Prototype/tweets_Infonavit.csv')
 
-texts <- iconv(texts,'utf-8','ascii', sub = '')
-
-fwrite(texts, 'C:/Users/IN334839/Documents/BEDU_Prototype_Data_Analysis/texts.csv')
-
+texts_Fovissste <- as.data.frame(texts_Fovissste)
+fwrite(texts_Fovissste, 'C:/Users/IN334839/Desktop/Cursos/Data Analysis/Prototype/tweets_Fovissste.csv')
 
 
